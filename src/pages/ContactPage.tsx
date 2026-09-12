@@ -21,7 +21,6 @@ import {
   MessageSquare,
   Copy,
   ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 

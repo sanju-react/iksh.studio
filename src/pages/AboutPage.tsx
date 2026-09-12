@@ -1,6 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { studioInfo } from '../data/studio';
 import { LiveClock } from '../components/common/LiveClock';
 import { Compass, Eye, HeartHandshake, ShieldCheck } from 'lucide-react';
 import { FinalCTA } from '../sections/FinalCTA';
