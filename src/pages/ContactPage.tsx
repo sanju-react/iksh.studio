@@ -120,10 +120,9 @@ export const ContactPage: React.FC = () => {
 
   const projectTypeOptions = [
     'Branding & Visual Identity',
-    'Website Design & Dev',
+    'Creative Modern Website',
     'Graphic Design & Print',
     'Digital Marketing & Growth',
-    'Complete Brand Ecosystem',
     'Creative Strategy',
   ];
 
@@ -158,21 +157,45 @@ export const ContactPage: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const formatMessageText = () => {
-    const selectedServices =
-      formData.projectTypes.length > 0
-        ? formData.projectTypes.map((s) => `  • ${s}`).join('\n')
-        : '  • General Brand Inquiry';
+    const name = formData.name.trim();
+    const phone = formData.phone.trim();
+    const email = formData.email.trim();
+    const services = formData.projectTypes;
+    const message = formData.message.trim();
 
-    return (
-      `✨ *NEW PROJECT INQUIRY — IKSH STUDIO* ✨\n\n` +
-      `👤 *Client Name:* ${formData.name.trim()}\n` +
-      `📱 *Mobile Number:* ${formData.phone.trim()}\n` +
-      `📧 *Work Email:* ${formData.email.trim()}\n\n` +
-      `🎯 *Services Required:*\n${selectedServices}\n\n` +
-      `📝 *Project Vision & Details:*\n${formData.message.trim()}\n\n` +
-      `──────────────────\n` +
-      `_Sent from IKSH Studio Portfolio_`
-    );
+    if (!name && !phone && !email && services.length === 0 && !message) {
+      return (
+        `Hello IKSH Studio,\n\n` +
+        `I would like to inquire about your creative services and discuss a potential project.\n\n` +
+        `---\n` +
+        `Sent via iksh.studio`
+      );
+    }
+
+    const servicesList =
+      services.length > 0
+        ? services.map((s) => `- ${s}`).join('\n')
+        : '- General Inquiry';
+
+    let text = `NEW PROJECT INQUIRY — IKSH STUDIO\n\n`;
+
+    if (name) text += `Name: ${name}\n`;
+    if (phone) text += `Phone: ${phone}\n`;
+    if (email) text += `Email: ${email}\n`;
+    text += `\n`;
+
+    text += `Services Required:\n`;
+    text += `${servicesList}\n\n`;
+
+    if (message) {
+      text += `Project Details:\n`;
+      text += `${message}\n\n`;
+    }
+
+    text += `---\n`;
+    text += `Sent via iksh.studio`;
+
+    return text;
   };
 
   const getWhatsAppUrl = (phoneNumber: string) => {
@@ -255,27 +278,28 @@ export const ContactPage: React.FC = () => {
     }, 400);
   };
 
-  const handleWhatsAppSubmit = async (phoneNumber: string = STUDIO_PHONE_NUMBER) => {
-    if (!validate()) return;
-
-    setIsSubmitting(true);
+  const handleWhatsAppSubmit = (phoneNumber: string = STUDIO_PHONE_NUMBER) => {
     saveLead();
-    await copyTextToClipboard(formatMessageText());
 
-    window.open(getWhatsAppUrl(phoneNumber), '_blank', 'noopener,noreferrer');
+    const targetUrl = getWhatsAppUrl(phoneNumber);
+
+    // Direct synchronous window open to avoid mobile/browser popup blockers
+    const win = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      window.location.href = targetUrl;
+    }
+
+    copyTextToClipboard(formatMessageText()).catch(() => {});
 
     showStudioToast({
       title: 'Opening WhatsApp Chat',
-      message: 'Brief copied to clipboard and WhatsApp conversation started.',
+      message: 'Connecting to IKSH Studio on WhatsApp (+91 88498 86332)...',
       email: studioInfo.email,
       type: 'success',
     });
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      triggerCelebration();
-    }, 400);
+    setIsSubmitted(true);
+    triggerCelebration();
   };
 
   const handleCopySummary = async () => {
